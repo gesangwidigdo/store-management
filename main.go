@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gesangwidigdo/store-management/initializers"
+	"github.com/gesangwidigdo/store-management/routes"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,6 +20,8 @@ func main() {
 			"project_name": "store-management",
 		})
 	})
+
+	routes.Routes(r)
 
 	r.Run()
 }
