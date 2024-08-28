@@ -103,11 +103,10 @@ func UpdateProduct(c *gin.Context) {
 func UpdateProductStock(c *gin.Context) {
 	var productData updateStockInput
 
-	
 	if err := utils.BindData(&productData, c); !err {
 		return
 	}
-	
+
 	id := productData.ID
 
 	var product models.Product
@@ -118,7 +117,9 @@ func UpdateProductStock(c *gin.Context) {
 
 	// update stock
 	updateStock := models.Product{
-		Stock: product.Stock + productData.Stock,
+		Product_name: product.Product_name,
+		Price:        product.Price,
+		Stock:        product.Stock + productData.Stock,
 	}
 
 	if err := initializers.DB.Model(&product).Updates(updateStock); err.Error != nil {
