@@ -15,6 +15,11 @@ type productInput struct {
 	Stock        int     `json:"stock" binding:"numeric"`
 }
 
+type updateStockInput struct {
+	ID    uint `json:"id" binding:"required,numeric"`
+	Stock int  `json:"stock" binding:"required,numeric"`
+}
+
 func CreateProduct(c *gin.Context) {
 	var productData productInput
 
@@ -93,6 +98,35 @@ func UpdateProduct(c *gin.Context) {
 	}
 
 	utils.ReturnResponse(http.StatusOK, "ok", "new_data", updatedProduct, c)
+}
+
+func UpdateProductStock(c *gin.Context) {
+	var productData updateStockInput
+
+	
+	if err := utils.BindData(&productData, c); !err {
+		return
+	}
+	
+	id := productData.ID
+
+	var product models.Product
+	if result := initializers.DB.First(&product, id); result.Error != nil {
+		utils.ReturnResponse(http.StatusBadRequest, "failed to get data", "error", result.Error.Error(), c)
+		return
+	}
+
+	// update stock
+	updateStock := models.Product{
+		Stock: product.Stock + productData.Stock,
+	}
+
+	if err := initializers.DB.Model(&product).Updates(updateStock); err.Error != nil {
+		utils.ReturnResponse(http.StatusBadRequest, "failed to update stock", "error", err.Error.Error(), c)
+		return
+	}
+
+	utils.ReturnResponse(http.StatusOK, "ok", "data", updateStock, c)
 }
 
 func DeleteProduct(c *gin.Context) {
