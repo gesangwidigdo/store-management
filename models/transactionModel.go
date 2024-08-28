@@ -13,4 +13,6 @@ type Transaction struct {
 	Transaction_time time.Time `gorm:"not null; type:datetime; default:CURRENT_TIMESTAMP()"`
 
 	Employee Employee `gorm:"foreignKey:Employee_id;references:ID"`
+
+	Product []Product `gorm:"many2many:product_transaction;"`
 }

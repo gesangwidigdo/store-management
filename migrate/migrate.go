@@ -12,7 +12,7 @@ func init() {
 
 func main() {
 	// Custom many2many
-	initializers.DB.SetupJoinTable(&models.Product{}, "Transaction", &models.ProductTransaction{})
+	initializers.DB.SetupJoinTable(&models.Transaction{}, "Product", &models.ProductTransaction{})
 
 	initializers.DB.AutoMigrate(
 		&models.Employee{},
