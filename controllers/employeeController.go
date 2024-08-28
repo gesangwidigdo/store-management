@@ -6,6 +6,7 @@ import (
 	"github.com/gesangwidigdo/store-management/initializers"
 	"github.com/gesangwidigdo/store-management/models"
 	"github.com/gesangwidigdo/store-management/utils"
+	customresponse "github.com/gesangwidigdo/store-management/utils/customResponse"
 	"github.com/gin-gonic/gin"
 )
 
@@ -33,11 +34,11 @@ func CreateEmployee(c *gin.Context) {
 	}
 
 	employee := models.Employee{
-		Employee_name: employeeData.Employee_name,
-		Gender: employeeData.Gender,
+		Employee_name:    employeeData.Employee_name,
+		Gender:           employeeData.Gender,
 		Telephone_number: employeeData.Telephone_number,
-		Username: employeeData.Username,
-		Password: hashedPwd,
+		Username:         employeeData.Username,
+		Password:         hashedPwd,
 	}
 
 	if result := initializers.DB.Create(&employee); result.Error != nil {
@@ -50,13 +51,18 @@ func CreateEmployee(c *gin.Context) {
 
 func GetAllEmployee(c *gin.Context) {
 	var employees []models.Employee
-	
+
 	if result := initializers.DB.Find(&employees); result.Error != nil {
 		utils.ReturnResponse(http.StatusBadRequest, "failed get data", "error", result.Error.Error(), c)
 		return
 	}
 
-	utils.ReturnResponse(http.StatusOK, "ok", "data", employees, c)
+	var employeeResponses []customresponse.EmployeeResponse
+	for _, emp := range employees {
+		employeeResponses = append(employeeResponses, customresponse.EmployeeResponseData(emp))
+	}
+
+	utils.ReturnResponse(http.StatusOK, "ok", "data", employeeResponses, c)
 }
 
 func GetEmployeeByID(c *gin.Context) {
@@ -68,7 +74,9 @@ func GetEmployeeByID(c *gin.Context) {
 		return
 	}
 
-	utils.ReturnResponse(http.StatusOK, "ok", "data", employee, c)
+	employeeResponse := customresponse.EmployeeResponseData(employee)
+
+	utils.ReturnResponse(http.StatusOK, "ok", "data", employeeResponse, c)
 }
 
 func UpdateEmployee(c *gin.Context) {
@@ -94,11 +102,11 @@ func UpdateEmployee(c *gin.Context) {
 
 	// new data
 	newData := models.Employee{
-		Employee_name: employeeData.Employee_name,
-		Gender: employeeData.Gender,
+		Employee_name:    employeeData.Employee_name,
+		Gender:           employeeData.Gender,
 		Telephone_number: employeeData.Telephone_number,
-		Username: employeeData.Username,
-		Password: hashedPwd,
+		Username:         employeeData.Username,
+		Password:         hashedPwd,
 	}
 
 	if result := initializers.DB.Model(&employee).Updates(newData); result.Error != nil {
