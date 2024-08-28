@@ -11,13 +11,11 @@ func init() {
 }
 
 func main() {
-	// Custom many2many
-	initializers.DB.SetupJoinTable(&models.Product{}, "Transaction", &models.ProductTransaction{})
-
-	initializers.DB.AutoMigrate(
+	initializers.DB.Migrator().DropTable(
 		&models.Employee{},
 		&models.Payment{},
 		&models.Product{},
 		&models.Transaction{},
+		&models.ProductTransaction{},
 	)
 }
