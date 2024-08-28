@@ -7,7 +7,6 @@ import (
 )
 
 type ProductTransaction struct {
-	gorm.Model
 	Transaction_id uint    `gorm:"primaryKey;autoIncrement:false"`
 	Product_id     uint    `gorm:"primaryKey;autoIncrement:false"`
 	Quantity       int     `gorm:"not null; type:integer"`

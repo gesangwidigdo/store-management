@@ -14,4 +14,8 @@ func Routes(r *gin.Engine) {
 	// transaction route
 	transactionRoutes := r.Group("/transaction")
 	TransactionRoute(transactionRoutes)
+
+	// product transaction
+	ptRoutes := r.Group("/product_transaction")
+	ProductTransactionRoute(ptRoutes)
 }
