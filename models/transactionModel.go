@@ -1,12 +1,16 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Transaction struct {
 	gorm.Model
-	Employee_id      uint     `gorm:"index"`
-	Total_price      float64  `gorm:"not null; type:decimal"`
-	Transaction_time string   `gorm:"not null; type:datetime"`
+	Employee_id      uint      `gorm:"index"`
+	Grand_total      float64   `gorm:"not null; type:decimal; default: 0"`
+	Transaction_time time.Time `gorm:"not null; type:datetime; default:CURRENT_TIMESTAMP()"`
 
-	Employee         Employee `gorm:"foreignKey:Employee_id;references:ID"`
+	Employee Employee `gorm:"foreignKey:Employee_id;references:ID"`
 }
