@@ -14,5 +14,5 @@ type Transaction struct {
 
 	Employee Employee `gorm:"foreignKey:Employee_id;references:ID"`
 
-	Product []Product `gorm:"many2many:product_transaction;"`
+	Product []Product `gorm:"many2many:product_transactions;"`
 }

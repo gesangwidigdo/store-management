@@ -37,7 +37,7 @@ func CreateTransaction(c *gin.Context) {
 func GetAllTransaction(c *gin.Context) {
 	var transactions []models.Transaction
 
-	if result := initializers.DB.Preload("Employee").Find(&transactions); result.Error != nil {
+	if result := initializers.DB.Preload("Employee").Preload("Product").Find(&transactions); result.Error != nil {
 		utils.ReturnResponse(http.StatusBadRequest, utils.GET_FAILED, "error", result.Error.Error(), c)
 		return
 	}
