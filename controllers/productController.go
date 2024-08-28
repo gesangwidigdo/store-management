@@ -12,7 +12,7 @@ import (
 type productInput struct {
 	Product_name string  `json:"product_name" binding:"required"`
 	Price        float64 `json:"price" binding:"required,numeric"`
-	Stock        int  `json:"stock" binding:"required,numeric"`
+	Stock        int     `json:"stock" binding:"numeric"`
 }
 
 func CreateProduct(c *gin.Context) {
