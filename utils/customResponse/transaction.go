@@ -11,8 +11,6 @@ type TransactionResponse struct {
 	Grand_total      float64                 `json:"grand_total"`
 	Transaction_time time.Time               `json:"transaction_time"`
 	Employee         ForeignEmployeeResponse `json:"employee_data"`
-	CreatedAt        time.Time               `json:"created_at"`
-	UpdatedAt        time.Time               `json:"updated_at"`
 	Product          []ProductResponse       `json:"product_list"`
 }
 
