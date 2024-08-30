@@ -36,11 +36,20 @@ func CreateProductTransaction(c *gin.Context) {
 		return
 	}
 
+	// get transaction data
+	var transaction models.Transaction
+	if err := initializers.DB.First(&transaction, PTData.Transaction_id); err.Error != nil {
+		utils.ReturnResponse(http.StatusBadRequest, "retrieve transaction data failed", "error", "data not found", c)
+		return
+	}
+
+	// calculate total
+	totalPrice := product.Price * float64(PTData.Quantity)
 	productTransaction := models.ProductTransaction{
 		Transaction_id: PTData.Transaction_id,
 		Product_id: PTData.Product_id,
 		Quantity: PTData.Quantity,
-		Total: product.Price * float64(PTData.Quantity),
+		Total: totalPrice,
 	}
 
 	if result := initializers.DB.Create(&productTransaction); result.Error != nil {
@@ -51,6 +60,12 @@ func CreateProductTransaction(c *gin.Context) {
 	// decrease product's stock
 	if err := initializers.DB.Model(&models.Product{}).Where("id = ?", PTData.Product_id).Update("stock", product.Stock - PTData.Quantity); err.Error != nil {
 		utils.ReturnResponse(http.StatusBadRequest, "failed to update data", "error", err.Error.Error(), c)
+		return
+	}
+
+	// update grand total
+	if err := initializers.DB.Model(&models.Transaction{}).Where("id = ?", PTData.Transaction_id).Update("grand_total", transaction.Grand_total + totalPrice); err.Error != nil {
+		utils.ReturnResponse(http.StatusBadRequest, "failed to update transaction data", "error", err.Error.Error(), c)
 		return
 	}
 
