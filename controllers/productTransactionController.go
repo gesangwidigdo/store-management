@@ -56,14 +56,3 @@ func CreateProductTransaction(c *gin.Context) {
 
 	utils.ReturnResponse(http.StatusCreated, "ok", "data", productTransaction, c)
 }
-
-func GetAllProductTransaction(c *gin.Context) {
-	var productTransactions []models.ProductTransaction
-
-	if result := initializers.DB.Find(&productTransactions); result.Error != nil {
-		utils.ReturnResponse(http.StatusBadRequest, utils.GET_FAILED, "error", result.Error.Error(), c)
-		return
-	}
-
-	utils.ReturnResponse(http.StatusOK, "ok", "data", productTransactions, c)
-}
