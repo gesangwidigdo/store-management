@@ -6,6 +6,7 @@ import (
 	"github.com/gesangwidigdo/store-management/initializers"
 	"github.com/gesangwidigdo/store-management/models"
 	"github.com/gesangwidigdo/store-management/utils"
+	customresponse "github.com/gesangwidigdo/store-management/utils/customResponse"
 	"github.com/gin-gonic/gin"
 )
 
@@ -50,7 +51,12 @@ func GetAllProduct(c *gin.Context) {
 		return
 	}
 
-	utils.ReturnResponse(http.StatusOK, "ok", "data", products, c)
+	var productResponses []customresponse.ProductResponse
+	for _, product := range products {
+		productResponses = append(productResponses, customresponse.ToProductResponse(product))
+	}
+
+	utils.ReturnResponse(http.StatusOK, "ok", "data", productResponses, c)
 }
 
 func GetProductByID(c *gin.Context) {
@@ -62,7 +68,9 @@ func GetProductByID(c *gin.Context) {
 		return
 	}
 
-	utils.ReturnResponse(http.StatusOK, "ok", "data", product, c)
+	productResponse := customresponse.ToProductResponse(product)
+
+	utils.ReturnResponse(http.StatusOK, "ok", "data", productResponse, c)
 }
 
 func UpdateProduct(c *gin.Context) {
