@@ -69,7 +69,7 @@ func DeleteTransaction(c *gin.Context) {
 	var transaction models.Transaction
 
 	if result := initializers.DB.Delete(&transaction, id); result.Error != nil {
-		utils.ReturnResponse(http.StatusBadRequest, utils.GET_FAILED, "error", result.Error.Error(), c)
+		utils.ReturnResponse(http.StatusBadRequest, utils.DELETE_FAILED, "error", result.Error.Error(), c)
 		return
 	}
 
