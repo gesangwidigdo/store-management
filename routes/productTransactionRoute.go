@@ -8,6 +8,6 @@ import (
 func ProductTransactionRoute(r *gin.RouterGroup) {
 	r.POST("/", controllers.CreateProductTransaction)
 	r.GET("/:id", controllers.GetProductTransactionByTransactionID)
-	// r.PUT("/:id", controllers.UpdateProductTransaction)
+	r.PUT("/:transaction_id/:product_id", controllers.UpdateQuantity)
 	r.DELETE("/:transaction_id/:product_id", controllers.DeleteProductTransaction)
 }

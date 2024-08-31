@@ -89,19 +89,33 @@ func GetProductTransactionByTransactionID(c *gin.Context) {
 	utils.ReturnResponse(http.StatusOK, "ok", "data", pts, c)
 }
 
-// func UpdateQuantity(c *gin.Context) {
-// 	transaction_id := c.Param("transaction_id")
-// 	product_id := c.Param("product_id")
+func UpdateQuantity(c *gin.Context) {
+	var newQty UpdateQtyInput
+	// bind new qty
+	if err := utils.BindData(&newQty, c); !err {
+		return
+	}
+	
+	transaction_id := c.Param("transaction_id")
+	product_id := c.Param("product_id")
 
-// 	var ptData models.ProductTransaction
+	var ptData models.ProductTransaction
 
-// 	if result := initializers.DB.Where("transaction_id = ? AND product_id = ?", transaction_id, product_id).First(&ptData); result.Error != nil {
-// 		utils.ReturnResponse(http.StatusBadRequest, utils.GET_FAILED, "error", result.Error.Error(), c)
-// 		return
-// 	}
-
-// 	if err := initializers.DB.Model(&models.ProductTransaction{}).Where("transaction_id = ? AND product_id = ?", transaction_id, product_id).Update("quantity", )
-// }
+	// find data
+	if result := initializers.DB.Where("transaction_id = ? AND product_id = ?", transaction_id, product_id).First(&ptData); result.Error != nil {
+		utils.ReturnResponse(http.StatusBadRequest, utils.GET_FAILED, "error", result.Error.Error(), c)
+		return
+	}
+	
+	// update data
+	ptData.Quantity = newQty.Quantity
+	if result := initializers.DB.Save(&ptData); result.Error != nil {
+		utils.ReturnResponse(http.StatusBadRequest, utils.UPDATE_FAILED, "error", result.Error.Error(), c)
+		return
+	}
+	
+	utils.ReturnResponse(http.StatusOK, "ok", "-", "", c)
+}
 
 func DeleteProductTransaction(c *gin.Context) {
 	transaction_id := c.Param("transaction_id")
