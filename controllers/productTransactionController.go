@@ -10,9 +10,13 @@ import (
 )
 
 type ProductTransactionInput struct {
-	Transaction_id uint    `json:"transaction_id" binding:"required,numeric"`
-	Product_id     uint    `json:"product_id" binding:"required,numeric"`
-	Quantity       int     `json:"quantity" binding:"required,numeric"`
+	Transaction_id uint `json:"transaction_id" binding:"required,numeric"`
+	Product_id     uint `json:"product_id" binding:"required,numeric"`
+	Quantity       int  `json:"quantity" binding:"required,numeric"`
+}
+
+type UpdateQtyInput struct {
+	Quantity int `json:"quantity" binding:"required,numeric"`
 }
 
 func CreateProductTransaction(c *gin.Context) {
@@ -45,11 +49,12 @@ func CreateProductTransaction(c *gin.Context) {
 
 	// calculate total
 	totalPrice := product.Price * float64(PTData.Quantity)
+
 	productTransaction := models.ProductTransaction{
 		Transaction_id: PTData.Transaction_id,
-		Product_id: PTData.Product_id,
-		Quantity: PTData.Quantity,
-		Total: totalPrice,
+		Product_id:     PTData.Product_id,
+		Quantity:       PTData.Quantity,
+		Total:          totalPrice,
 	}
 
 	if result := initializers.DB.Create(&productTransaction); result.Error != nil {
@@ -58,16 +63,74 @@ func CreateProductTransaction(c *gin.Context) {
 	}
 
 	// decrease product's stock
-	if err := initializers.DB.Model(&models.Product{}).Where("id = ?", PTData.Product_id).Update("stock", product.Stock - PTData.Quantity); err.Error != nil {
+	if err := initializers.DB.Model(&models.Product{}).Where("id = ?", PTData.Product_id).Update("stock", product.Stock-PTData.Quantity); err.Error != nil {
 		utils.ReturnResponse(http.StatusBadRequest, "failed to update data", "error", err.Error.Error(), c)
 		return
 	}
 
 	// update grand total
-	if err := initializers.DB.Model(&models.Transaction{}).Where("id = ?", PTData.Transaction_id).Update("grand_total", transaction.Grand_total + totalPrice); err.Error != nil {
+	if err := initializers.DB.Model(&models.Transaction{}).Where("id = ?", PTData.Transaction_id).Update("grand_total", transaction.Grand_total+totalPrice); err.Error != nil {
 		utils.ReturnResponse(http.StatusBadRequest, "failed to update transaction data", "error", err.Error.Error(), c)
 		return
 	}
 
 	utils.ReturnResponse(http.StatusCreated, "ok", "data", productTransaction, c)
+}
+
+func GetProductTransactionByTransactionID(c *gin.Context) {
+	transactionID := c.Param("id")
+	var pts []models.ProductTransaction
+
+	if err := initializers.DB.Model(&models.ProductTransaction{}).Where("transaction_id = ?", transactionID).Find(&pts); err.Error != nil {
+		utils.ReturnResponse(http.StatusBadRequest, utils.GET_FAILED, "error", err.Error.Error(), c)
+		return
+	}
+
+	utils.ReturnResponse(http.StatusOK, "ok", "data", pts, c)
+}
+
+// func UpdateQuantity(c *gin.Context) {
+// 	transaction_id := c.Param("transaction_id")
+// 	product_id := c.Param("product_id")
+
+// 	var ptData models.ProductTransaction
+
+// 	if result := initializers.DB.Where("transaction_id = ? AND product_id = ?", transaction_id, product_id).First(&ptData); result.Error != nil {
+// 		utils.ReturnResponse(http.StatusBadRequest, utils.GET_FAILED, "error", result.Error.Error(), c)
+// 		return
+// 	}
+
+// 	if err := initializers.DB.Model(&models.ProductTransaction{}).Where("transaction_id = ? AND product_id = ?", transaction_id, product_id).Update("quantity", )
+// }
+
+func DeleteProductTransaction(c *gin.Context) {
+	transaction_id := c.Param("transaction_id")
+	product_id := c.Param("product_id")
+
+	var ptData models.ProductTransaction
+	var transaction models.Transaction
+
+	// Fetch transaction
+	if result := initializers.DB.First(&transaction, transaction_id); result.Error != nil {
+		utils.ReturnResponse(http.StatusBadRequest, utils.GET_FAILED, "error", result.Error.Error(), c)
+		return
+	}
+
+	if result := initializers.DB.Where("transaction_id = ? AND product_id = ?", transaction_id, product_id).First(&ptData); result.Error != nil {
+		utils.ReturnResponse(http.StatusBadRequest, utils.GET_FAILED, "error", result.Error.Error(), c)
+		return
+	}
+
+	if err := initializers.DB.Model(models.Transaction{}).Where("id = ?", transaction_id).Update("grand_total", transaction.Grand_total - ptData.Total); err.Error != nil {
+		utils.ReturnResponse(http.StatusBadRequest, "failed to update transaction data", "error", err.Error.Error(), c)
+		return
+	}
+
+	if result := initializers.DB.Model(&models.ProductTransaction{}).Where("transaction_id = ? AND product_id = ?", transaction_id, product_id).Delete(&ptData); result.Error != nil {
+		utils.ReturnResponse(http.StatusBadRequest, utils.DELETE_FAILED, "error", result.Error.Error(), c)
+		return
+	}
+
+
+	utils.ReturnResponse(http.StatusOK, "ok", "", nil, c)
 }
