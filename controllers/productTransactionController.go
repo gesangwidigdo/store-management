@@ -6,6 +6,7 @@ import (
 	"github.com/gesangwidigdo/store-management/initializers"
 	"github.com/gesangwidigdo/store-management/models"
 	"github.com/gesangwidigdo/store-management/utils"
+	customresponse "github.com/gesangwidigdo/store-management/utils/customResponse"
 	"github.com/gin-gonic/gin"
 )
 
@@ -86,7 +87,12 @@ func GetProductTransactionByTransactionID(c *gin.Context) {
 		return
 	}
 
-	utils.ReturnResponse(http.StatusOK, "ok", "data", pts, c)
+	var ptResponse []customresponse.ProductTransactionResponse
+	for _, ptData := range pts {
+		ptResponse = append(ptResponse, customresponse.ToProductTransactionResponse(ptData))
+	}
+
+	utils.ReturnResponse(http.StatusOK, "ok", "data", ptResponse, c)
 }
 
 func UpdateQuantity(c *gin.Context) {
