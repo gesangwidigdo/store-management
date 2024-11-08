@@ -13,11 +13,11 @@ import (
 type productInput struct {
 	Product_name string  `json:"product_name" binding:"required"`
 	Price        float64 `json:"price" binding:"required,numeric"`
-	Stock        int     `json:"stock" binding:"numeric"`
+	Stock        int     `json:"stock"`
 }
 
 type updateStockInput struct {
-	ID    uint `json:"id" binding:"required,numeric"`
+	ID    uint `json:"product_id" binding:"required,numeric"`
 	Stock int  `json:"stock" binding:"required,numeric"`
 }
 
